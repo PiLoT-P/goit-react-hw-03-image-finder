@@ -15,6 +15,7 @@ class PhotoPage extends Component{
 
     state = {
         gallery: [],
+        totalPage: false,
         page: 1,
         query: '',
         isLoading: false,
@@ -41,14 +42,17 @@ class PhotoPage extends Component{
 
     setPhotos = async () => {
         const { page, query } = this.state;
-        this.setState({ isLoading: true });
+        this.setState({ isLoading: true, error: null });
 
         try {
             const data = await getDataServer(query, page);
-
-            this.setState((prev) => ({
-                gallery: page === 1 ? data.hits : [...prev.gallery, ...data.hits],
-            }))
+            if (data.hits.length === 0) {
+                this.setState({ totalPage: true });
+            } else {
+                this.setState((prev) => ({
+                    gallery: page === 1 ? data.hits : [...prev.gallery, ...data.hits],
+                }))
+            }
         } catch (error) {
             this.setState({ error: error.message });
         } finally {
@@ -65,12 +69,11 @@ class PhotoPage extends Component{
     };
 
     openModal = (modalData) => {
-        console.log(modalData);
         this.setState({ modalData });
     }
 
     render() {
-        const { gallery, error, modalData } = this.state;
+        const { gallery, error, modalData, totalPage } = this.state;
 
         return (
             <>
@@ -80,10 +83,9 @@ class PhotoPage extends Component{
                 ) : (
                     <>
                         <ImageGallery gallery={gallery} openModal={this.openModal}/>
-                        {gallery.length > 0 && <Button onClick={this.changePage} />}
+                        {gallery.length > 0 && !totalPage ? (<Button onClick={this.changePage}/>): (<div></div>)}
                     </>
                 )}
-                {/* <Modal/> */}
                 {modalData && (<Modal {...modalData} closeModal={this.closeModal}/>)}
             </>
         );

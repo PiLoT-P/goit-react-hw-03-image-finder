@@ -19,7 +19,6 @@ class Searchbar extends Component{
     }
 
     render() {
-        console.log('serach render');
         return (
             <header className={css.searchbar} onSubmit={this.hendelSubmit}>
                 <form className={css.form}>

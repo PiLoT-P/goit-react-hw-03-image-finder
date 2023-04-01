@@ -5,6 +5,7 @@ import Searchbar from "./Searchbar/Searchbar";
 
 import "../index.css";
 import css from "./App.module.css";
+
 class App extends Component{
   state = {
     query: '',
