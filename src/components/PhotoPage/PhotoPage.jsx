@@ -15,7 +15,7 @@ class PhotoPage extends Component{
 
     state = {
         gallery: [],
-        totalPage: false,
+        disabledButton: false,
         page: 1,
         query: '',
         isLoading: false,
@@ -46,13 +46,14 @@ class PhotoPage extends Component{
 
         try {
             const data = await getDataServer(query, page);
-            if (data.hits.length === 0) {
-                this.setState({ totalPage: true });
+            if (data.hits.length < 12) {
+                this.setState({ disabledButton: true });
             } else {
-                this.setState((prev) => ({
-                    gallery: page === 1 ? data.hits : [...prev.gallery, ...data.hits],
-                }))
-            }
+                this.setState({ disabledButton: false });
+            } 
+            this.setState((prev) => ({
+                gallery: page === 1 ? data.hits : [...prev.gallery, ...data.hits],
+            }))
         } catch (error) {
             this.setState({ error: error.message });
         } finally {
@@ -73,7 +74,7 @@ class PhotoPage extends Component{
     }
 
     render() {
-        const { gallery, error, modalData, totalPage } = this.state;
+        const { gallery, error, modalData, disabledButton } = this.state;
 
         return (
             <>
@@ -83,7 +84,7 @@ class PhotoPage extends Component{
                 ) : (
                     <>
                         <ImageGallery gallery={gallery} openModal={this.openModal}/>
-                        {gallery.length > 0 && !totalPage ? (<Button onClick={this.changePage}/>): (<div></div>)}
+                        {gallery.length > 0 && !disabledButton ? (<Button onClick={this.changePage}/>): (<div></div>)}
                     </>
                 )}
                 {modalData && (<Modal {...modalData} closeModal={this.closeModal}/>)}
